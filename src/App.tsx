@@ -401,7 +401,7 @@ export default function RSVPReader() {
             style={{ color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}
           >
             <p>
-              For more information you can watch{' '}
+              For more information on how it works, and to test your reading and comprehension limits you can watch:{' '}
               <a
                 href="https://www.youtube.com/watch?v=NdKcDPBQ-Lw"
                 target="_blank"
@@ -421,7 +421,7 @@ export default function RSVPReader() {
               >
                 BuffedYT
               </a>
-              {' '}for some more information on how it works and to test your reading and comprehension speed.
+              {' '}.
             </p>
           </div>
 
