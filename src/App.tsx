@@ -1,33 +1,40 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, RotateCcw, Settings } from 'lucide-react';
 
-const DEFAULT_TEXT = "Rapid serial visual presentation (RSVP) is a scientific method for studying the timing of vision. In RSVP, a sequence of stimuli is shown to an observer at one location in their visual field. The observer is instructed to report one of these stimuli - the target - which has a feature that differentiates it from the rest of the stream. For instance, observers may see a sequence of stimuli consisting of gray letters with the exception of one red letter. They are told to report the red letter. People make errors in this task in the form of reports of stimuli that occurred before or after the target. The position in time of the letter they report, relative to the target, is an estimate of the timing of visual selection on that trial. The term, and methodologies to study it, was first introduced by Mary C. Potter.";
+const DEFAULT_TEXT =
+  "Rapid serial visual presentation (RSVP) is a scientific method for studying the timing of vision. In RSVP, a sequence of stimuli is shown to an observer at one location in their visual field. The observer is instructed to report one of these stimuli - the target - which has a feature that differentiates it from the rest of the stream. For instance, observers may see a sequence of stimuli consisting of gray letters with the exception of one red letter. They are told to report the red letter. People make errors in this task in the form of reports of stimuli that occurred before or after the target. The position in time of the letter they report, relative to the target, is an estimate of the timing of visual selection on that trial. The term, and methodologies to study it, was first introduced by Mary C. Potter.";
 
-const TEXT_SIZES = [32, 40, 48, 60, 72, 84];
+const TEXT_SIZES = [32, 40, 48, 60, 72, 84] as const;
 const MIN_WPM = 100;
 const MAX_WPM = 1000;
 const DEFAULT_WPM = 300;
 const DEFAULT_COLOR = '#f87171';
 
+type StripChars = {
+  punctuation: boolean;
+  brackets: boolean;
+  quotes: boolean;
+};
+
 export default function RSVPReader() {
-  const [text, setText] = useState(DEFAULT_TEXT);
-  const [words, setWords] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [wpm, setWpm] = useState(DEFAULT_WPM);
-  const [showSettings, setShowSettings] = useState(false);
-  const [textSize, setTextSize] = useState(3);
-  const [theme, setTheme] = useState('dark');
-  const [orpColor, setOrpColor] = useState(DEFAULT_COLOR);
-  const [stripChars, setStripChars] = useState({
+  const [text, setText] = useState<string>(DEFAULT_TEXT);
+  const [words, setWords] = useState<string[]>([]);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [wpm, setWpm] = useState<number>(DEFAULT_WPM);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [textSize, setTextSize] = useState<number>(3);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [orpColor, setOrpColor] = useState<string>(DEFAULT_COLOR);
+  const [stripChars, setStripChars] = useState<StripChars>({
     punctuation: false,
     brackets: false,
     quotes: false
   });
 
-  const intervalRef = useRef(null);
+  const intervalRef = useRef<number | null>(null);
 
-  // Process text and update word array when text or strip settings change
+  // Process text
   useEffect(() => {
     if (!text) return;
 
@@ -48,10 +55,10 @@ export default function RSVPReader() {
     setCurrentIndex(0);
   }, [text, stripChars]);
 
-  // Handle playback timer
+  // Playback timer
   useEffect(() => {
     if (!isPlaying || words.length === 0) {
-      if (intervalRef.current) {
+      if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
       }
       return;
@@ -59,7 +66,7 @@ export default function RSVPReader() {
 
     const msPerWord = 60000 / wpm;
 
-    intervalRef.current = setInterval(() => {
+    intervalRef.current = window.setInterval(() => {
       setCurrentIndex(prev => {
         if (prev >= words.length - 1) {
           setIsPlaying(false);
@@ -70,25 +77,27 @@ export default function RSVPReader() {
     }, msPerWord);
 
     return () => {
-      if (intervalRef.current) {
+      if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
       }
     };
   }, [isPlaying, wpm, words.length]);
 
-  const togglePlay = () => {
+  const togglePlay = (): void => {
     if (currentIndex >= words.length - 1) {
       setCurrentIndex(0);
     }
-    setIsPlaying(!isPlaying);
+    setIsPlaying(p => !p);
   };
 
-  const reset = () => {
+  const reset = (): void => {
     setIsPlaying(false);
     setCurrentIndex(0);
   };
 
-  const handleProgressClick = e => {
+  const handleProgressClick = (
+    e: React.MouseEvent<HTMLDivElement>
+  ): void => {
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const pct = clickX / rect.width;
@@ -97,27 +106,29 @@ export default function RSVPReader() {
     setIsPlaying(false);
   };
 
-  const handleWpmChange = val => {
-    const num = parseInt(val);
+  const handleWpmChange = (val: string): void => {
+    const num = parseInt(val, 10);
     if (!isNaN(num) && num >= MIN_WPM && num <= MAX_WPM) {
       setWpm(num);
     }
   };
 
-  // Calculate ORP position based on word length
-  const getORPIndex = word => {
+  const getORPIndex = (word: string): number => {
     const len = word.length;
     if (len === 1) return 0;
     if (len <= 5) return 1;
     return Math.floor(len * 0.3);
   };
 
-  const currentWord = words[currentIndex] || '';
-  const progress = words.length > 0 ? ((currentIndex + 1) / words.length) * 100 : 0;
+  const currentWord = words[currentIndex] ?? '';
+  const progress =
+    words.length > 0 ? ((currentIndex + 1) / words.length) * 100 : 0;
+
   const orpIdx = getORPIndex(currentWord);
+
   const wordParts = {
     before: currentWord.slice(0, orpIdx),
-    orp: currentWord[orpIdx] || '',
+    orp: currentWord[orpIdx] ?? '',
     after: currentWord.slice(orpIdx + 1)
   };
 
