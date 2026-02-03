@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, RotateCcw, Settings } from 'lucide-react';
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 const DEFAULT_TEXT =
   "Rapid serial visual presentation (RSVP) is a scientific method for studying the timing of vision. In RSVP, a sequence of stimuli is shown to an observer at one location in their visual field. The observer is instructed to report one of these stimuli - the target - which has a feature that differentiates it from the rest of the stream. For instance, observers may see a sequence of stimuli consisting of gray letters with the exception of one red letter. They are told to report the red letter. People make errors in this task in the form of reports of stimuli that occurred before or after the target. The position in time of the letter they report, relative to the target, is an estimate of the timing of visual selection on that trial. The term, and methodologies to study it, was first introduced by Mary C. Potter.";
@@ -144,11 +144,22 @@ export default function RSVPReader() {
     display: theme === 'dark' ? 'bg-black/30' : 'bg-white/50',
     input: theme === 'dark' ? 'bg-black/30' : 'bg-white/70',
     border: theme === 'dark' ? 'border-white/20' : 'border-black/20',
-    progressBg: theme === 'dark' ? 'bg-white/20' : 'bg-black/20'
+    progressBg: theme === 'dark' ? 'bg-white/20' : 'bg-black/20',
+    scrollbar: `custom-scrollbar ${theme === 'dark' ? 'dark-scroll' : 'light-scroll'}`
   };
 
+  <style dangerouslySetInnerHTML={{
+    __html: `
+  .${theme} ::-webkit-scrollbar-thumb {
+    background: ${orpColor}40 !important; 
+  }
+  .${theme} ::-webkit-scrollbar-thumb:hover {
+    background: ${orpColor}80 !important;
+  }
+`}} />
+
   return (
-    <div className={`min-h-screen ${styles.bg} flex items-center justify-center p-4`}>
+    <div className={`min-h-screen ${theme} ${styles.bg} flex items-center justify-center p-4`}>
       <div className="w-full max-w-4xl">
         <div className={`${styles.card} rounded-2xl shadow-2xl p-8 border`}>
           <h1 className={`text-4xl font-bold ${styles.text} mb-6 text-center`}>
@@ -387,7 +398,7 @@ export default function RSVPReader() {
             <textarea
               value={text}
               onChange={e => setText(e.target.value)}
-              className={`w-full ${styles.input} ${styles.text} rounded-lg p-4 border ${styles.border} focus:outline-none min-h-[120px]`}
+              className={`w-full ${styles.input} ${styles.text} ${styles.scrollbar} rounded-lg p-4 border ${styles.border} focus:outline-none min-h-[120px] resize-y`}
               placeholder="Paste your text here to speed read..."
             />
           </div>
