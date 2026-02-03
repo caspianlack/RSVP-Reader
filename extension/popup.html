@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSVP Settings</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <h1 class="popup-title">RSVP Speed Reader</h1>
+    <p class="popup-subtitle">Settings</p>
+    
+    <div class="setting-section">
+      <label class="setting-label">Speed (Words Per Minute)</label>
+      <div class="wpm-controls">
+        <input type="number" id="wpm-input" min="100" max="1000" step="50" class="wpm-number">
+        <span>WPM</span>
+      </div>
+      <input type="range" id="wpm-slider" min="100" max="1000" step="50" class="slider">
+      <div class="slider-labels">
+        <span>100</span>
+        <span>1000</span>
+      </div>
+    </div>
+
+    <div class="setting-section">
+      <label class="setting-label">Text Size</label>
+      <div class="size-grid">
+        <button class="size-btn" data-size="0">32</button>
+        <button class="size-btn" data-size="1">40</button>
+        <button class="size-btn" data-size="2">48</button>
+        <button class="size-btn" data-size="3">60</button>
+        <button class="size-btn" data-size="4">72</button>
+        <button class="size-btn" data-size="5">84</button>
+      </div>
+    </div>
+
+    <div class="setting-section">
+      <label class="setting-label">Theme</label>
+      <div class="theme-buttons">
+        <button class="theme-btn" data-theme="dark">🌙 Dark</button>
+        <button class="theme-btn" data-theme="light">☀️ Light</button>
+      </div>
+    </div>
+
+    <div class="setting-section">
+      <label class="setting-label">ORP Highlight Color</label>
+      <div class="color-controls">
+        <input type="color" id="color-picker" class="color-picker">
+        <input type="text" id="color-text" class="color-text" placeholder="#f87171">
+      </div>
+    </div>
+
+    <div class="setting-section">
+      <label class="setting-label">Strip Characters</label>
+      <div class="checkbox-list">
+        <label class="checkbox-item">
+          <input type="checkbox" id="strip-punctuation">
+          <span>Punctuation ( . , ! ? ; : )</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="strip-brackets">
+          <span>Brackets ( [ ] ( ) { } )</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="strip-quotes">
+          <span>Quotes ( ' " )</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="popup-footer">
+      <p class="usage-hint">💡 Highlight any text on a webpage to use RSVP Reader</p>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

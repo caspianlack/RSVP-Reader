@@ -1,0 +1,561 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* DARK MODE FIX: Set actual dark background for the body when in dark mode */
+body.dark-mode {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+body.light-mode {
+  background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow: hidden;
+  gap: 1rem;
+}
+
+.header-section {
+  width: 100%;
+  max-width: 64rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  width: 100%;
+  max-width: 64rem;
+  max-height: 80vh;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+  border: 1px solid;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* DARK MODE FIX: Use actual dark backgrounds */
+.card.dark {
+  background: rgba(20, 20, 30, 0.95);
+  backdrop-filter: blur(16px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.card.light {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.text-white { color: white; }
+.text-dark { color: #111827; }
+
+.title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+}
+
+.close-btn {
+  position: relative;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  line-height: 1;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.close-btn.light:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.display-area {
+  border-radius: 0.75rem;
+  padding: 4rem;
+  margin-bottom: 1.5rem;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: 1px solid;
+}
+
+/* DARK MODE FIX: Darker display area with border */
+.display-area.dark {
+  background: rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.display-area.light {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.word-container {
+  display: flex;
+  align-items: baseline;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  letter-spacing: -0.025em;
+}
+
+.word-part {
+  opacity: 0.9;
+  display: inline-block;
+}
+
+.word-before { text-align: right; width: 300px; }
+.word-after { text-align: left; width: 300px; }
+
+.word-orp {
+  padding: 0 0.25rem;
+  border-bottom: 4px solid;
+  display: inline-block;
+}
+
+.counter {
+  position: absolute;
+  bottom: 2rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  opacity: 0.6;
+  font-size: 0.875rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 0.75rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  transition: height 0.2s;
+  /* IMPORTANT: Make sure progress bar stays visible above settings */
+  position: relative;
+  z-index: 5;
+  flex-shrink: 0;
+}
+
+.progress-bar:hover {
+  height: 1rem;
+}
+
+/* DARK MODE FIX: Better contrast for progress bar background */
+.progress-bar.dark {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.progress-bar.light {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.2s;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+}
+
+.btn {
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-size: 1.25rem;
+  pointer-events: auto;
+  position: relative;
+  z-index: 100;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-small {
+  padding: 0.75rem 1rem;
+}
+
+.btn-large {
+  padding: 1rem 1.5rem;
+  font-size: 1.5rem;
+}
+
+.settings-panel {
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  max-height: none;
+  overflow-y: visible;
+  overflow-x: hidden;
+  flex-shrink: 0;
+  /* Settings panel should be BELOW progress bar in z-index */
+  position: relative;
+  z-index: 1;
+}
+
+/* DARK MODE FIX: Darker settings panel */
+.settings-panel.dark {
+  background: rgba(30, 30, 40, 0.9);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.settings-panel.light {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Custom scrollbar for all scrollable elements */
+.card::-webkit-scrollbar,
+.settings-panel::-webkit-scrollbar,
+.textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card.dark::-webkit-scrollbar-track,
+.settings-panel.dark::-webkit-scrollbar-track,
+.textarea.dark::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.card.light::-webkit-scrollbar-track,
+.settings-panel.light::-webkit-scrollbar-track,
+.textarea.light::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.card.dark::-webkit-scrollbar-thumb,
+.settings-panel.dark::-webkit-scrollbar-thumb,
+.textarea.dark::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.card.light::-webkit-scrollbar-thumb,
+.settings-panel.light::-webkit-scrollbar-thumb,
+.textarea.light::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.card.dark::-webkit-scrollbar-thumb:hover,
+.settings-panel.dark::-webkit-scrollbar-thumb:hover,
+.textarea.dark::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.card.light::-webkit-scrollbar-thumb:hover,
+.settings-panel.light::-webkit-scrollbar-thumb:hover,
+.textarea.light::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.settings-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.setting-group {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.input {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid;
+  outline: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+/* DARK MODE FIX: Darker inputs */
+.input.dark {
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.input.dark:focus {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.input.light {
+  background: rgba(255, 255, 255, 0.9);
+  color: #111827;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.input.light:focus {
+  background: white;
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.slider {
+  width: 100%;
+  margin-bottom: 0.25rem;
+  cursor: pointer;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  opacity: 0.6;
+  font-size: 0.875rem;
+}
+
+.theme-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.theme-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.theme-btn.active {
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.theme-btn.inactive.dark {
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-btn.inactive.dark:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.theme-btn.inactive.light {
+  background: rgba(255, 255, 255, 0.8);
+  color: #111827;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.theme-btn.inactive.light:hover {
+  background: white;
+}
+
+.text-size-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+}
+
+.size-btn {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.size-btn.active {
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.size-btn.inactive.dark {
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.size-btn.inactive.dark:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.size-btn.inactive.light {
+  background: rgba(255, 255, 255, 0.8);
+  color: #111827;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.size-btn.inactive.light:hover {
+  background: white;
+}
+
+.color-picker {
+  width: 4rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  border: none;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: background 0.2s;
+}
+
+.checkbox-label:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.checkbox-label.light:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.textarea {
+  width: 100%;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+/* DARK MODE FIX: Darker textarea */
+.textarea.dark {
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.textarea.dark:focus {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.textarea.light {
+  background: rgba(255, 255, 255, 0.9);
+  color: #111827;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.textarea.light:focus {
+  background: white;
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  opacity: 0.7;
+  font-size: 0.875rem;
+}
+
+.footer a {
+  text-decoration: underline;
+}
+
+.footer a:hover {
+  text-decoration: none;
+}
+
+.small-text {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.instructions {
+  margin-top: 1.5rem;
+  text-align: center;
+  opacity: 0.6;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.instructions p {
+  margin-top: 0.25rem;
+}
+
+.hidden {
+  display: none;
+}
