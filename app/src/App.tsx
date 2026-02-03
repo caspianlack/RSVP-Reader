@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, RotateCcw, Settings } from 'lucide-react';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const DEFAULT_TEXT =
   "Rapid serial visual presentation (RSVP) is a scientific method for studying the timing of vision. In RSVP, a sequence of stimuli is shown to an observer at one location in their visual field. The observer is instructed to report one of these stimuli - the target - which has a feature that differentiates it from the rest of the stream. For instance, observers may see a sequence of stimuli consisting of gray letters with the exception of one red letter. They are told to report the red letter. People make errors in this task in the form of reports of stimuli that occurred before or after the target. The position in time of the letter they report, relative to the target, is an estimate of the timing of visual selection on that trial. The term, and methodologies to study it, was first introduced by Mary C. Potter.";
@@ -444,6 +445,8 @@ export default function RSVPReader() {
           </div>
         </div>
       </div>
+      <SpeedInsights />
     </div>
+
   );
 }
