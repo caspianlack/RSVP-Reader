@@ -27,7 +27,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["reader.html", "reader.css", "reader.js"],
+      "resources": ["reader.html", "reader.css", "reader.js", "vectors/*.svg"],
       "matches": ["<all_urls>"]
     }
   ]

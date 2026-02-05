@@ -9,7 +9,7 @@ function createRSVPButton() {
   button.innerHTML = 'Read with RSVP';
   button.style.cssText = `
   position: absolute;
-  background: rgba(20, 20, 20, 0.75);
+  background: rgba(20, 20, 20, 0.5);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   color: #fff;

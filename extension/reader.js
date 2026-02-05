@@ -102,30 +102,46 @@ function processText(text) {
 
 function togglePlay() {
   console.log('togglePlay called, isPlaying:', state.isPlaying);
+  
+  // Reset to start if we're at the end
   if (state.currentIndex >= state.words.length - 1) {
-    setState({ currentIndex: 0 });
+    state.currentIndex = 0;
   }
   
   if (!state.isPlaying) {
     const msPerWord = 60000 / state.wpm;
     console.log('Starting playback, ms per word:', msPerWord);
+    
+    // Clear any existing interval first
+    if (state.intervalId) {
+      clearInterval(state.intervalId);
+    }
+    
     const intervalId = setInterval(() => {
       if (state.currentIndex >= state.words.length - 1) {
-        clearInterval(state.intervalId);
-        setState({ isPlaying: false, intervalId: null });
+        clearInterval(intervalId);
+        state.isPlaying = false;
+        state.intervalId = null;
+        updateWordDisplay();
       } else {
-        // Don't use setState here - just update the index and re-render manually
         state.currentIndex = state.currentIndex + 1;
         updateWordDisplay();
       }
     }, msPerWord);
-    setState({ isPlaying: true, intervalId });
+    
+    // Update state directly without calling setState
+    state.isPlaying = true;
+    state.intervalId = intervalId;
+    updateWordDisplay();
   } else {
     console.log('Pausing playback');
     if (state.intervalId) {
       clearInterval(state.intervalId);
     }
-    setState({ isPlaying: false, intervalId: null });
+    // Update state directly without calling setState
+    state.isPlaying = false;
+    state.intervalId = null;
+    updateWordDisplay();
   }
 }
 
@@ -194,7 +210,9 @@ function updateWordDisplay() {
   // Update play button icon
   const playBtn = document.getElementById('play-btn');
   if (playBtn) {
-    playBtn.innerHTML = state.isPlaying ? '⏸' : '▶';
+    const iconPath = state.isPlaying ? 'vectors/pause-square.svg' : 'vectors/play-alt.svg';
+    const iconUrl = chrome.runtime.getURL(iconPath);
+    playBtn.innerHTML = `<img src="${iconUrl}" alt="${state.isPlaying ? 'Pause' : 'Play'}" style="width: 1.5rem; height: 1.5rem; display: block; filter: invert(1);">`;
   }
 }
 
@@ -211,15 +229,24 @@ function render() {
 
   const themeClass = state.theme === 'dark' ? 'dark' : 'light';
   const textClass = state.theme === 'dark' ? 'text-white' : 'text-dark';
+  const iconFilter = state.theme === 'dark' ? 'invert(1)' : 'none';
 
-  // DARK MODE FIX: Add theme class to body
+  // Add theme class to body
   document.body.className = state.theme === 'dark' ? 'dark-mode' : 'light-mode';
+
+  // Get icon URLs
+  const playIconUrl = chrome.runtime.getURL(state.isPlaying ? 'vectors/pause-square.svg' : 'vectors/play-alt.svg');
+  const resetIconUrl = chrome.runtime.getURL('vectors/rotate-right.svg');
+  const settingsIconUrl = chrome.runtime.getURL('vectors/settings-sliders.svg');
+  const closeIconUrl = chrome.runtime.getURL('vectors/circle-xmark.svg');
 
   document.getElementById('app').innerHTML = `
     <div class="container ${themeClass}">
       <div class="header-section">
         <h1 class="title ${textClass}">RSVP Speed Reader</h1>
-        <button class="close-btn ${textClass}" id="close-btn">×</button>
+        <button class="close-btn ${textClass}" id="close-btn">
+          <img src="${closeIconUrl}" alt="Close" style="width: 1.5rem; height: 1.5rem; display: block; filter: ${iconFilter};">
+        </button>
       </div>
       
       <div class="card ${themeClass}">
@@ -235,30 +262,45 @@ function render() {
         </div>
 
         <div class="progress-bar ${themeClass}" id="progress-bar">
-          <div class="progress-fill" style="width: ${progress}%; background: linear-gradient(to right, ${state.orpColor}80, ${state.orpColor});"></div>
+          <div class="progress-fill" style="width: ${progress}%; background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd);"></div>
         </div>
 
         <div class="controls">
-          <button class="btn btn-small" style="background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd);" id="reset-btn">↺</button>
-          <button class="btn btn-large" style="background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd);" id="play-btn">${state.isPlaying ? '⏸' : '▶'}</button>
-          <button class="btn btn-small" style="background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd);" id="settings-btn">⚙</button>
+          <button class="btn" id="reset-btn" style="background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd); padding: 0.75rem 1.25rem;">
+            <img src="${resetIconUrl}" alt="Reset" style="width: 1.125rem; height: 1.125rem; display: block; filter: invert(1);">
+          </button>
+          <button class="btn btn-large" id="play-btn" style="background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd);">
+            <img src="${playIconUrl}" alt="${state.isPlaying ? 'Pause' : 'Play'}" style="width: 1.5rem; height: 1.5rem; display: block; filter: invert(1);">
+          </button>
+          <button class="btn" id="settings-btn" style="background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd); padding: 0.75rem 1.25rem;">
+            <img src="${settingsIconUrl}" alt="Settings" style="width: 1.125rem; height: 1.125rem; display: block; filter: invert(1);">
+          </button>
         </div>
 
         <div class="settings-panel ${themeClass} ${state.showSettings ? '' : 'hidden'}">
           <h3 class="settings-title ${textClass}">Settings</h3>
-
+          
           <div class="setting-group">
             <label class="label ${textClass}">Speed (Words Per Minute)</label>
             <div class="input-group">
-              <input type="number" min="${MIN_WPM}" max="${MAX_WPM}" step="50" value="${state.wpm}" 
-                class="input ${themeClass}" style="width: 6rem;"
-                id="wpm-input">
+              <input type="number" 
+                class="input ${themeClass}" 
+                id="wpm-input" 
+                value="${state.wpm}" 
+                min="${MIN_WPM}" 
+                max="${MAX_WPM}" 
+                step="50"
+                style="width: 5rem;">
               <span class="${textClass}">WPM</span>
             </div>
-            <input type="range" min="${MIN_WPM}" max="${MAX_WPM}" step="50" value="${state.wpm}" 
-              class="slider"
-              id="wpm-slider">
-            <div class="slider-labels ${textClass}">
+            <input type="range" 
+              class="slider" 
+              id="wpm-slider" 
+              value="${state.wpm}" 
+              min="${MIN_WPM}" 
+              max="${MAX_WPM}" 
+              step="50">
+            <div class="slider-labels">
               <span>${MIN_WPM}</span>
               <span>${MAX_WPM}</span>
             </div>
@@ -268,9 +310,12 @@ function render() {
             <label class="label ${textClass}">Text Size</label>
             <div class="text-size-grid">
               ${TEXT_SIZES.map((size, i) => `
-                <button class="size-btn ${state.textSize === i ? 'active' : `inactive ${themeClass}`}" 
-                  style="${state.textSize === i ? `background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd); color: white;` : ''}"
-                  id="size-btn-${i}">${size}</button>
+                <button 
+                  class="size-btn ${i === state.textSize ? 'active' : `inactive ${themeClass}`}" 
+                  id="size-btn-${i}"
+                  ${i === state.textSize ? `style="background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd); color: white;"` : ''}>
+                  ${size}
+                </button>
               `).join('')}
             </div>
           </div>
@@ -278,24 +323,34 @@ function render() {
           <div class="setting-group">
             <label class="label ${textClass}">Theme</label>
             <div class="theme-buttons">
-              <button class="theme-btn ${state.theme === 'dark' ? 'active' : `inactive ${themeClass}`}" 
-                style="${state.theme === 'dark' ? `background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd);` : ''}"
-                id="theme-dark-btn">Dark Mode</button>
-              <button class="theme-btn ${state.theme === 'light' ? 'active' : `inactive ${themeClass}`}"
-                style="${state.theme === 'light' ? `background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd);` : ''}"
-                id="theme-light-btn">Light Mode</button>
+              <button 
+                class="theme-btn ${state.theme === 'dark' ? 'active' : `inactive ${themeClass}`}" 
+                id="theme-dark-btn"
+                ${state.theme === 'dark' ? `style="background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd); color: white;"` : ''}>
+                <img src="${chrome.runtime.getURL('vectors/moon-stars.svg')}" alt="Dark" style="width: 1rem; height: 1rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem; filter: ${state.theme === 'dark' ? 'invert(1)' : iconFilter};">
+                Dark
+              </button>
+              <button 
+                class="theme-btn ${state.theme === 'light' ? 'active' : `inactive ${themeClass}`}" 
+                id="theme-light-btn"
+                ${state.theme === 'light' ? `style="background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd); color: white;"` : ''}>
+                <img src="${chrome.runtime.getURL('vectors/sun.svg')}" alt="Light" style="width: 1rem; height: 1rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem; filter: ${state.theme === 'light' ? 'invert(1)' : iconFilter};">
+                Light
+              </button>
             </div>
           </div>
 
           <div class="setting-group">
             <label class="label ${textClass}">ORP Highlight Color</label>
             <div class="input-group">
-              <input type="color" value="${state.orpColor}" 
-                class="color-picker"
-                id="color-picker">
-              <input type="text" value="${state.orpColor}" 
-                class="input ${themeClass}" style="flex: 1;"
-                id="color-text"
+              <input type="color" 
+                class="color-picker ${themeClass}" 
+                id="color-picker" 
+                value="${state.orpColor}">
+              <input type="text" 
+                class="input ${themeClass}" 
+                id="color-text" 
+                value="${state.orpColor}"
                 placeholder="#f87171">
             </div>
           </div>
@@ -327,6 +382,9 @@ function render() {
         <div class="instructions ${textClass}">
           <p>The highlighted character is the Optimal Recognition Point (ORP)</p>
           <p>Keep your eyes focused on this spot for maximum reading speed</p>
+          <p>Uicons by <a target="_blank" rel="noopener noreferrer" href="https://www.flaticon.com/uicons">Flaticon</a></p>
+          <br>
+          <p>Try the designated <a target="_blank" rel="noopener noreferrer" href="https://rsvp-speed-reader.vercel.app/">Website</a></p>
         </div>
       </div>
     </div>
@@ -471,6 +529,8 @@ function attachEventListeners() {
     if (colorText) colorText.value = e.target.value;
     // Update ORP color in display
     updateWordDisplay();
+    // Update active button colors
+    updateActiveButtonColors();
   });
 
   if (colorText) colorText.addEventListener('change', (e) => {
@@ -482,6 +542,8 @@ function attachEventListeners() {
       if (picker) picker.value = e.target.value;
       // Update ORP color in display
       updateWordDisplay();
+      // Update active button colors
+      updateActiveButtonColors();
     }
   });
 
@@ -489,7 +551,6 @@ function attachEventListeners() {
     state.stripChars.punctuation = e.target.checked;
     saveSettings();
     processText(state.text);
-    // Don't call render() - processText already updates via setState
   });
 
   if (stripBrackets) stripBrackets.addEventListener('change', (e) => {
@@ -504,7 +565,7 @@ function attachEventListeners() {
     processText(state.text);
   });
 
-    if (textArea) textArea.addEventListener('input', (e) => {
+  if (textArea) textArea.addEventListener('input', (e) => {
     // Store scroll position
     const scrollTop = textArea.scrollTop;
     processText(e.target.value);
@@ -516,7 +577,33 @@ function attachEventListeners() {
       }
     });
   });
+}
+
+function updateActiveButtonColors() {
+  // Update progress bar fill
+  const progressFill = document.querySelector('.progress-fill');
+  if (progressFill) {
+    progressFill.style.background = `linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd)`;
   }
+
+  // Update play button
+  const playBtn = document.getElementById('play-btn');
+  if (playBtn) {
+    playBtn.style.background = `linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd)`;
+  }
+
+  // Update active size button
+  const activeSizeBtn = document.getElementById(`size-btn-${state.textSize}`);
+  if (activeSizeBtn && activeSizeBtn.classList.contains('active')) {
+    activeSizeBtn.style.background = `linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd)`;
+  }
+
+  // Update active theme button
+  const activeThemeBtn = document.getElementById(`theme-${state.theme}-btn`);
+  if (activeThemeBtn && activeThemeBtn.classList.contains('active')) {
+    activeThemeBtn.style.background = `linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd)`;
+  }
+}
 
 // Listen for text from parent
 window.addEventListener('message', (e) => {
@@ -529,3 +616,41 @@ window.addEventListener('message', (e) => {
 // Initial render and load settings
 console.log('Reader initializing...');
 loadSettings();
+// Listen for settings changes from popup
+if (typeof chrome !== 'undefined' && chrome.storage) {
+  chrome.storage.onChanged.addListener((changes, namespace) => {
+    console.log('Storage changed:', changes);
+    
+    // Update WPM if changed
+    if (changes.wpm) {
+      setState({ wpm: changes.wpm.newValue });
+      // Restart playback if currently playing
+      if (state.isPlaying && state.intervalId) {
+        clearInterval(state.intervalId);
+        togglePlay(); // This will restart with new WPM
+      }
+    }
+    
+    // Update text size if changed
+    if (changes.textSize !== undefined) {
+      setState({ textSize: changes.textSize.newValue });
+    }
+    
+    // Update theme if changed
+    if (changes.theme) {
+      setState({ theme: changes.theme.newValue });
+    }
+    
+    // Update color if changed
+    if (changes.orpColor) {
+      setState({ orpColor: changes.orpColor.newValue });
+    }
+    
+    // Update strip chars if changed
+    if (changes.stripChars) {
+      setState({ stripChars: changes.stripChars.newValue });
+      // Reprocess text with new strip settings
+      processText(state.text);
+    }
+  });
+}

@@ -10,22 +10,77 @@ const DEFAULT_SETTINGS = {
   }
 };
 
+let currentOrpColor = DEFAULT_SETTINGS.orpColor;
+
 // Load settings and update UI
 function loadSettings() {
   chrome.storage.sync.get(DEFAULT_SETTINGS, (settings) => {
+    // Apply theme to body
+    document.body.className = settings.theme;
+    currentOrpColor = settings.orpColor;
+    
+    // Load SVG icons
+    const darkIcon = document.getElementById('theme-icon-dark');
+    const lightIcon = document.getElementById('theme-icon-light');
+    
+    if (darkIcon) {
+      darkIcon.src = chrome.runtime.getURL('vectors/moon-stars.svg');
+      darkIcon.style.width = '1rem';
+      darkIcon.style.height = '1rem';
+      darkIcon.style.display = 'inline-block';
+      darkIcon.style.verticalAlign = 'middle';
+      darkIcon.style.marginRight = '0.25rem';
+    }
+    
+    if (lightIcon) {
+      lightIcon.src = chrome.runtime.getURL('vectors/sun.svg');
+      lightIcon.style.width = '1rem';
+      lightIcon.style.height = '1rem';
+      lightIcon.style.display = 'inline-block';
+      lightIcon.style.verticalAlign = 'middle';
+      lightIcon.style.marginRight = '0.25rem';
+    }
+    
     // WPM
     document.getElementById('wpm-input').value = settings.wpm;
     document.getElementById('wpm-slider').value = settings.wpm;
 
     // Text size
     document.querySelectorAll('.size-btn').forEach((btn, index) => {
-      btn.classList.toggle('active', index === settings.textSize);
+      if (index === settings.textSize) {
+        btn.className = 'size-btn active';
+        btn.style = `background: linear-gradient(to right, ${settings.orpColor}, ${settings.orpColor}dd); color: white;`;
+      } else {
+        btn.className = `size-btn inactive ${settings.theme}`;
+        btn.style = '';
+      }
     });
 
-    // Theme
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.theme === settings.theme);
-    });
+    // Theme buttons
+    const themeDarkBtn = document.getElementById('theme-dark-btn');
+    const themeLightBtn = document.getElementById('theme-light-btn');
+    
+    if (themeDarkBtn && themeLightBtn) {
+      if (settings.theme === 'dark') {
+        themeDarkBtn.className = 'theme-btn active';
+        themeDarkBtn.style = `background: linear-gradient(to right, ${settings.orpColor}, ${settings.orpColor}dd); color: white;`;
+        themeLightBtn.className = `theme-btn inactive ${settings.theme}`;
+        themeLightBtn.style = '';
+        
+        // Set icon filters
+        if (darkIcon) darkIcon.style.filter = 'invert(1)';
+        if (lightIcon) lightIcon.style.filter = settings.theme === 'dark' ? 'invert(1)' : 'none';
+      } else {
+        themeLightBtn.className = 'theme-btn active';
+        themeLightBtn.style = `background: linear-gradient(to right, ${settings.orpColor}, ${settings.orpColor}dd); color: white;`;
+        themeDarkBtn.className = `theme-btn inactive ${settings.theme}`;
+        themeDarkBtn.style = '';
+        
+        // Set icon filters
+        if (lightIcon) lightIcon.style.filter = 'invert(1)';
+        if (darkIcon) darkIcon.style.filter = settings.theme === 'dark' ? 'invert(1)' : 'none';
+      }
+    }
 
     // Color
     document.getElementById('color-picker').value = settings.orpColor;
@@ -43,6 +98,11 @@ function saveSettings(updates) {
   chrome.storage.sync.get(DEFAULT_SETTINGS, (current) => {
     const newSettings = { ...current, ...updates };
     chrome.storage.sync.set(newSettings);
+    
+    // Update current color if changed
+    if (updates.orpColor) {
+      currentOrpColor = updates.orpColor;
+    }
   });
 }
 
@@ -64,8 +124,16 @@ document.getElementById('wpm-slider').addEventListener('input', (e) => {
 // Text size buttons
 document.querySelectorAll('.size-btn').forEach((btn, index) => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    // Update all size buttons
+    document.querySelectorAll('.size-btn').forEach((b, i) => {
+      if (i === index) {
+        b.className = 'size-btn active';
+        b.style = `background: linear-gradient(to right, ${currentOrpColor}, ${currentOrpColor}dd); color: white;`;
+      } else {
+        b.className = `size-btn inactive ${document.body.className}`;
+        b.style = '';
+      }
+    });
     saveSettings({ textSize: index });
   });
 });
@@ -73,22 +141,63 @@ document.querySelectorAll('.size-btn').forEach((btn, index) => {
 // Theme buttons
 document.querySelectorAll('.theme-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    saveSettings({ theme: btn.dataset.theme });
+    const theme = btn.dataset.theme;
+    document.body.className = theme;
+    
+    const darkIcon = document.getElementById('theme-icon-dark');
+    const lightIcon = document.getElementById('theme-icon-light');
+    const themeDarkBtn = document.getElementById('theme-dark-btn');
+    const themeLightBtn = document.getElementById('theme-light-btn');
+    
+    // Update all theme buttons
+    document.querySelectorAll('.theme-btn').forEach(b => {
+      if (b.dataset.theme === theme) {
+        b.className = 'theme-btn active';
+        b.style = `background: linear-gradient(to right, ${currentOrpColor}, ${currentOrpColor}dd); color: white;`;
+      } else {
+        b.className = `theme-btn inactive ${theme}`;
+        b.style = '';
+      }
+    });
+    
+    // Update icon filters
+    if (darkIcon && lightIcon) {
+      if (theme === 'dark') {
+        darkIcon.style.filter = 'invert(1)';
+        lightIcon.style.filter = 'none';
+      } else {
+        lightIcon.style.filter = 'invert(1)';
+        darkIcon.style.filter = 'none';
+      }
+    }
+    
+    // Update inactive size buttons
+    document.querySelectorAll('.size-btn.inactive').forEach(b => {
+      b.className = `size-btn inactive ${theme}`;
+    });
+    
+    saveSettings({ theme: theme });
   });
 });
 
 // Color picker
 document.getElementById('color-picker').addEventListener('input', (e) => {
-  document.getElementById('color-text').value = e.target.value;
-  saveSettings({ orpColor: e.target.value });
+  const color = e.target.value;
+  document.getElementById('color-text').value = color;
+  saveSettings({ orpColor: color });
+  
+  // Update active buttons with new color
+  updateActiveButtonColors(color);
 });
 
 document.getElementById('color-text').addEventListener('change', (e) => {
-  if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-    document.getElementById('color-picker').value = e.target.value;
-    saveSettings({ orpColor: e.target.value });
+  const color = e.target.value;
+  if (/^#[0-9A-F]{6}$/i.test(color)) {
+    document.getElementById('color-picker').value = color;
+    saveSettings({ orpColor: color });
+    
+    // Update active buttons with new color
+    updateActiveButtonColors(color);
   }
 });
 
@@ -116,6 +225,23 @@ document.getElementById('strip-quotes').addEventListener('change', (e) => {
     saveSettings({ stripChars });
   });
 });
+
+// Helper function to update active button colors
+function updateActiveButtonColors(color) {
+  currentOrpColor = color;
+  
+  // Update active size button
+  const activeSizeBtn = document.querySelector('.size-btn.active');
+  if (activeSizeBtn) {
+    activeSizeBtn.style.background = `linear-gradient(to right, ${color}, ${color}dd)`;
+  }
+  
+  // Update active theme button
+  const activeThemeBtn = document.querySelector('.theme-btn.active');
+  if (activeThemeBtn) {
+    activeThemeBtn.style.background = `linear-gradient(to right, ${color}, ${color}dd)`;
+  }
+}
 
 // Load settings on popup open
 loadSettings();

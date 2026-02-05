@@ -6,29 +6,53 @@
 
 body {
   width: 320px;
-  font-family: system-ui, -apple-system, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  min-height: 500px; /* Minimum height */
+  max-height: 600px; /* Maximum height */
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+/* Apply theme classes to body */
+body.dark {
+  background: #0a0a0a;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+body.light {
+  background: #fafafa;
+  color: rgba(0, 0, 0, 0.87);
 }
 
 .popup-container {
-  padding: 1rem;
+  padding: 1.25rem;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .popup-title {
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 700;
   margin-bottom: 0.25rem;
   text-align: center;
+  letter-spacing: -0.025em;
 }
 
 .popup-subtitle {
   text-align: center;
-  opacity: 0.9;
+  opacity: 0.85;
   font-size: 0.875rem;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+}
+
+/* Theme-based border */
+body.dark .popup-subtitle {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+body.light .popup-subtitle {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 .setting-section {
@@ -40,7 +64,7 @@ body {
   font-weight: 600;
   font-size: 0.875rem;
   margin-bottom: 0.5rem;
-  opacity: 0.95;
+  opacity: 0.9;
 }
 
 .wpm-controls {
@@ -52,17 +76,41 @@ body {
 
 .wpm-number {
   width: 5rem;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
   outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
-.wpm-number:focus {
-  background: rgba(255, 255, 255, 0.3);
+/* Theme-based input styling */
+body.dark .wpm-number {
+  background: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.87);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark .wpm-number:focus {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.light .wpm-number {
+  background: rgba(255, 255, 255, 0.9);
+  color: rgba(0, 0, 0, 0.87);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light .wpm-number:focus {
+  background: white;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.wpm-controls span {
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0.9;
 }
 
 .slider {
@@ -75,7 +123,8 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  opacity: 0.7;
+  opacity: 0.6;
+  font-weight: 500;
 }
 
 .size-grid {
@@ -86,23 +135,42 @@ body {
 
 .size-btn {
   padding: 0.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  border: 1px solid transparent;
 }
 
-.size-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+/* Theme-based size button */
+.size-btn.inactive.dark {
+  background: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.size-btn.inactive.dark:hover {
+  background: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.size-btn.inactive.light {
+  background: rgba(0, 0, 0, 0.02);
+  color: rgba(0, 0, 0, 0.7);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.size-btn.inactive.light:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.9);
 }
 
 .size-btn.active {
-  background: white;
-  color: #667eea;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  border: none;
 }
 
 .theme-buttons {
@@ -113,23 +181,52 @@ body {
 .theme-btn {
   flex: 1;
   padding: 0.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
 }
 
-.theme-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+/* Theme-based theme button */
+.theme-btn.inactive.dark {
+  background: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-btn.inactive.dark:hover {
+  background: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.theme-btn.inactive.light {
+  background: rgba(0, 0, 0, 0.02);
+  color: rgba(0, 0, 0, 0.7);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-btn.inactive.light:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.9);
 }
 
 .theme-btn.active {
-  background: white;
-  color: #667eea;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  border: none;
+}
+
+.theme-btn svg {
+  width: 1rem;
+  height: 1rem;
+  display: inline-block;
 }
 
 .color-controls {
@@ -141,25 +238,51 @@ body {
 .color-picker {
   width: 3rem;
   height: 2.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
   cursor: pointer;
-  background: transparent;
+  border: 1px solid;
+}
+
+/* Theme-based color picker */
+body.dark .color-picker {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.light .color-picker {
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
 .color-text {
   flex: 1;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
   outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
-.color-text:focus {
-  background: rgba(255, 255, 255, 0.3);
+/* Theme-based color text input */
+body.dark .color-text {
+  background: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.87);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark .color-text:focus {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.light .color-text {
+  background: rgba(255, 255, 255, 0.9);
+  color: rgba(0, 0, 0, 0.87);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light .color-text:focus {
+  background: white;
+  border-color: rgba(0, 0, 0, 0.2);
 }
 
 .checkbox-list {
@@ -174,13 +297,25 @@ body {
   gap: 0.5rem;
   cursor: pointer;
   padding: 0.5rem;
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  transition: background 0.2s;
+  border-radius: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.checkbox-item:hover {
-  background: rgba(255, 255, 255, 0.2);
+/* Theme-based checkbox */
+body.dark .checkbox-item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark .checkbox-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.light .checkbox-item {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+body.light .checkbox-item:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .checkbox-item input[type="checkbox"] {
@@ -191,17 +326,101 @@ body {
 
 .checkbox-item span {
   font-size: 0.875rem;
+  font-weight: 500;
+  flex: 1;
 }
 
 .popup-footer {
   margin-top: 1.5rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Theme-based footer border */
+body.dark .popup-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+body.light .popup-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 .usage-hint {
   text-align: center;
   font-size: 0.75rem;
-  opacity: 0.8;
-  line-height: 1.4;
+  opacity: 0.75;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* Custom scrollbar for popup */
+.popup-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+body.dark .popup-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+body.light .popup-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+body.dark .popup-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+body.light .popup-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+body.dark .popup-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+body.light .popup-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Add some spacing at the bottom */
+.popup-container::after {
+  content: '';
+  display: block;
+  height: 0.5rem;
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.theme-icon, .theme-icon-l {
+  width: 1rem;
+  height: 1rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* For inactive buttons, set icon filter based on theme */
+.theme-btn.inactive.dark .theme-icon {
+  filter: invert(1);
+}
+
+.theme-btn.inactive.light .theme-icon {
+  filter: none;
+}
+
+#theme-icon-light {
+  filter: invert(1) !important;
+}
+
+
+/* For active buttons, always invert the icon to make it white */
+.theme-btn.active .theme-icon {
+  filter: invert(1);
 }
