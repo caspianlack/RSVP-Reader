@@ -210,6 +210,28 @@ function updateWordDisplay() {
   }
 }
 
+function applyThemeIcons() {
+  const darkIcon = document.getElementById('theme-icon-dark');
+  const lightIcon = document.getElementById('theme-icon-light');
+
+  if (!darkIcon || !lightIcon) return;
+
+  // Set SVG sources
+  darkIcon.src = chrome.runtime.getURL('vectors/moon-stars.svg');
+  lightIcon.src = chrome.runtime.getURL('vectors/sun.svg');
+
+  // Apply color filter based on theme
+  if (state.theme === 'dark') {
+    darkIcon.style.filter = 'invert(1)';
+    lightIcon.style.filter = 'invert(1)';
+  } else {
+    lightIcon.style.filter = 'invert(1)';
+    darkIcon.style.filter = 'none';
+  }
+}
+
+
+
 function updateUI() {
   // Update theme
   document.body.className = state.theme === 'dark' ? 'dark-mode' : 'light-mode';
@@ -287,6 +309,8 @@ function updateUI() {
       }
     }
   });
+
+  applyThemeIcons();
   
   // Update theme buttons
   const themeDarkBtn = document.getElementById('theme-dark-btn');
@@ -371,8 +395,9 @@ function initialRender() {
       <div class="header-section">
         <h1 class="title ${textClass}">RSVP Speed Reader</h1>
         <button class="close-btn ${textClass}" id="close-btn">
-          <img src="${closeIconUrl}" alt="Close" style="width: 1.75rem; height: 1.75rem; display: block; filter: ${iconFilter};">
+          <img src="${closeIconUrl}" alt="Close" class="close-icon" style="width: 1.75rem; height: 1.75rem; display: block;">
         </button>
+
       </div>
 
       <div class="card ${themeClass} custom-scrollbar">
@@ -433,12 +458,22 @@ function initialRender() {
           <div class="setting-group">
             <label class="label ${textClass}">Theme</label>
             <div class="theme-buttons">
-              <button class="theme-btn ${state.theme === 'dark' ? 'active' : `inactive ${state.theme}`}" 
-                      style="${state.theme === 'dark' ? `background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd); color: white;` : ''}" 
-                      id="theme-dark-btn">Dark</button>
-              <button class="theme-btn ${state.theme === 'light' ? 'active' : `inactive ${state.theme}`}" 
-                      style="${state.theme === 'light' ? `background: linear-gradient(to right, ${state.orpColor}, ${state.orpColor}dd); color: white;` : ''}" 
-                      id="theme-light-btn">Light</button>
+              <button
+                class="theme-btn ${state.theme === 'dark' ? 'active' : `inactive ${state.theme}`}"
+                data-theme="dark"
+                id="theme-dark-btn">
+                <img id="theme-icon-dark" />
+                Dark
+              </button>
+
+              <button
+                class="theme-btn ${state.theme === 'light' ? 'active' : `inactive ${state.theme}`}"
+                data-theme="light"
+                id="theme-light-btn">
+                <img id="theme-icon-light" />
+                Light
+              </button>
+
             </div>
           </div>
 
@@ -537,6 +572,7 @@ function attachEventListeners() {
         }
     }
   });
+
   
   // Progress bar click
   const progressBar = document.getElementById('progress-bar');

@@ -19,6 +19,36 @@ body.light-mode {
   color: rgba(0, 0, 0, 0.87);
 }
 
+/* Light/Dark Toggle icons */
+.theme-btn img {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  margin-right: 0.25em;
+}
+
+#theme-light-btn {
+  color: white;
+}
+
+.theme-icon {
+  width: 1em;
+  height: 1em;
+}
+
+
+.close-icon {
+  filter: invert(1);
+}
+
+body.light-mode .close-icon {
+  filter: invert(0);
+}
+
+body.dark-mode .close-icon {
+  filter: invert(1);
+}
+
 .container {
   height: 100vh;
   display: flex;
