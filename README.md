@@ -14,6 +14,9 @@
 
 RSVP Speed Reader is a browser extension and webapp that helps you read text faster by displaying one word at a time at your preferred speed. With the extension simply highlight any text on a webpage, click the extension icon, and start speed reading!
 
+## Available on Chrome
+[RSVP Speed Reader Extension](https://chromewebstore.google.com/detail/rsvp-speed-reader/hphbbncjdkeddjlgkjfkmkmmcbehgmhn)
+
 ## Features
 - Optimal Recognition Point for easier reading
 - Keyboard Shortcuts
